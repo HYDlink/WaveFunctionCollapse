@@ -17,6 +17,18 @@ using SixLabors.ImageSharp.Processing.Processors.Transforms;
 // namespace WaveFunctionCollapse;
 
 
+(string rawName, int rotate) ParseTileName(string name1)
+{
+    var strings = name1.Split(' ', 2);
+    var (rawName1, i) = strings switch
+    {
+        [{ } s1, { } s2] => (s1, int.Parse(s2)),
+        [{ } s3] => (s3, 0),
+        _ => throw new Exception("Invalid Name"),
+    };
+    return (rawName1, i);
+}
+
 var name = "Knots";
 var fileName = $"tilesets/{name}.xml";
 // var xml = File.ReadAllText(fileName);
@@ -26,18 +38,17 @@ var set = new TileSet(
         .Select(tile =>
         {
             var name = tile.Attribute("name").Value;
-            var strings = name.Split(' ', 2);
-            var (rawName, rotate) = strings switch
-            {
-                [{ } s1, { } s2] => (s1, s2),
-                [{ } s3] => (s3, "0"),
-                _ => throw new Exception("Invalid Name"),
-            };
+            var (rawName, rotate) = ParseTileName(name);
             var symmetry = Symmetry.TryParse<Symmetry>(tile.Attribute("symmetry").Value, out var s) ? s : default;
             return new Tile(rawName, symmetry, rotate);
         }).ToList(),
     xroot.Element("neighbors").Descendants()
-        .Select(neighbor => new Neighbor(neighbor.Attribute("left").Value, neighbor.Attribute("right").Value)).ToList(),
+        .Select(neighbor =>
+        {
+            var (leftName, leftRotate) = ParseTileName(neighbor.Attribute("left").Value);
+            var (rightName, rightRotate) = ParseTileName(neighbor.Attribute("right").Value);
+            return new Neighbor(leftName, leftRotate, rightName, rightRotate);
+        }).ToList(),
     // null
     xroot.Element("subsets").Descendants()
         .Select(s => new Subset(
@@ -54,23 +65,37 @@ image.Mutate(m => m.Resize(tile_width * 4, image.Height * 4, new NearestNeighbor
 
 
 var curTile = set.Tiles.First();
-var rightTiles = set.Tiles;
 using var output_img = new Image<Bgra32>(tile_width * 8, tile_height * 4, Color.White);
-output_img.Mutate(ctx => ctx.DrawImage(image, new Point(0, 0), 1f));
-foreach (var (i, rightTile) in rightTiles.Select((t,i) => (i, t.Name)))
+output_img.Mutate(ctx =>
+    ctx.DrawImage(image, new Point(0, 0), 1f));
+        // .Resize(tile_width * 4, image.Height * 4, new NearestNeighborResampler()));
+foreach (var (i, rightTile, rightRotate) in set.GetRightNeighbors(curTile.Name).Select((t, i) => (i, t.Name, t.Rotate)))
 {
     var x = tile_width * 4 + tile_width * (i % 4);
     var y = tile_height * (i / 4);
     using var neighbor = Image.Load<Bgra32>(TileFile(name, rightTile));
-    output_img.Mutate(ctx => ctx.DrawImage(neighbor, new Point(x, y), 1f));
+    neighbor.Mutate(n => n .Rotate(ToRotateMode(rightRotate)));
+    output_img.Mutate(ctx => ctx.DrawImage(neighbor, new Point(x, y), 1f)
+    );
+    // .Rotate(ToRotateMode(rightRotate)));
+    // .Rotate((RotateMode)(rightRotate)));
 }
+
+RotateMode ToRotateMode(int rotate) => rotate switch
+{
+    0 => RotateMode.None,
+    1 => RotateMode.Rotate270,
+    2 => RotateMode.Rotate180,
+    3 => RotateMode.Rotate90,
+    _ => throw new ArgumentOutOfRangeException(nameof(rotate), rotate, null)
+};
 Console.WriteLine(set.Tiles.Count);
 
 var folder = Directory.CreateDirectory("output");
 foreach (var file in folder.GetFiles()) file.Delete();
 var outputCornerX4Png = $"output\\corner_x4.png";
 output_img.Save(outputCornerX4Png, new PngEncoder());
-Process.Start(new ProcessStartInfo(outputCornerX4Png) {UseShellExecute = true});
+Process.Start(new ProcessStartInfo(outputCornerX4Png) { UseShellExecute = true });
 
 public enum Symmetry
 {
@@ -81,10 +106,20 @@ public enum Symmetry
     [Description("\\")] Slash,
 }
 
-public record Tile(string Name, Symmetry Symmetry, string Rotate);
+public record Tile(string Name, Symmetry Symmetry, int Rotate);
 
-public record Neighbor(string Left, string Right);
+public record Neighbor(string Left, int LeftRotate, string Right, int RightRotate);
 
 public record Subset(string Name, List<string> Tiles);
 
-public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> Subsets);
+public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> Subsets)
+{
+    public Tile GetTile(string name) => Tiles.FirstOrDefault(t => t.Name == name);
+
+    public List<(string Name, int Rotate)> GetRightNeighbors(string name)
+    {
+        var fromLeft = Neighbors.Where(n => n.Left == name && n.LeftRotate == 0)
+            .Select(n => (n.Right, n.RightRotate));
+        return fromLeft.ToList();
+    }
+};
