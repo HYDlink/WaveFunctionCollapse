@@ -24,7 +24,7 @@ public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> S
 
     public void Validate(long bitset)
     {
-        if (!isValidBitSet(bitset) || bitset == 0)
+        if (!isValidBitSet(bitset)) //|| bitset == 0)
             throw new InvalidOperationException("Invalid bitset");
     }
 

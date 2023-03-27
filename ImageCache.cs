@@ -22,9 +22,11 @@ public class ImageCache
 
     public int ImageWidth;
     public int ImageHeight;
+    public TileSet TileSet;
 
     public ImageCache(TileSet tileSet)
     {
+        TileSet = tileSet;
         OriginalImage = new Image<Bgra32>[tileSet.Tiles.Count * 4];
         EnlargedImage = new Image<Bgra32>[tileSet.Tiles.Count * 4];
 
@@ -57,6 +59,44 @@ public class ImageCache
 
             ti++;
         }
+    }
+
+    public Image<Bgra32> TestImageBuffer()
+    {
+        var tilesCount = TileSet.Tiles.Count;
+        var img = new Image<Bgra32>(tilesCount * ImageWidth * 4, 4 * ImageHeight * 4);
+        for (var i = 0; i < tilesCount; i++)
+        {
+            var name = TileSet.Tiles[i].Name;
+            var px = i * ImageWidth * 4;
+            for (int j = 0; j < 4; j++)
+            {
+                var py = j * ImageHeight * 4;
+                if (EnlargedImage[i * 4 + j] is { } image)
+                    img.Mutate(ctx => ctx.DrawImage(image, new Point(px, py), 1f));
+            }
+        }
+
+        return img;
+    }
+
+    public Image<Bgra32> TestImageBufferByBitSet()
+    {
+        var tilesCount = TileSet.Tiles.Count;
+        var map = new long[tilesCount, 4];
+        for (var i = 0; i < tilesCount; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                var index = i * 4 + j;
+                if (EnlargedImage[index] is { } image)
+                {
+                    map[i, j] = 1L << index;
+                }
+            }
+        }
+
+        return Draw(map);
     }
 
     public Image<Bgra32> Draw(long[,] collapsedData)

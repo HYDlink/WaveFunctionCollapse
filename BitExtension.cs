@@ -8,7 +8,7 @@ public static class BitExtension
     {
         for (int i = 0; (bitset >> i) != 0; i++)
         {
-            if ((bitset & (1 << i)) != 0)
+            if ((bitset & (1L << i)) != 0)
                 yield return i;
         }
     }
@@ -21,7 +21,7 @@ public static class BitExtension
         int bitIndex;
         do
         {
-            bitIndex = rand.Next(0, 32); // assuming a 32-bit integer
+            bitIndex = rand.Next(0, 64); // assuming a 64-bit integer
         } while (((num >> bitIndex) & 1) == 0); // continue until a 1 bit is found
 
         return bitIndex;

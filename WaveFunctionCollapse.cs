@@ -38,12 +38,12 @@ public class WaveFunctionCollapse
             CollapseTimes++;
             var formal = Image[x, y];
             var randomIndex = formal.RandomIndex(rand);
-            Image[x, y] = 1 << randomIndex;
+            Image[x, y] = 1L << randomIndex;
             Propagate(x, y);
 
             // 测试
-            if (CollapseTimes > 1000)
-                return;
+            // if (CollapseTimes > 1000)
+            //     return;
         }
     }
 
@@ -54,7 +54,8 @@ public class WaveFunctionCollapse
         {
             for (x = 0; x < Width; x++)
             {
-                if (!Image[x, y].IsOnlyOneBit())
+                var bitSet = Image[x, y];
+                if (bitSet != 0 && !bitSet.IsOnlyOneBit())
                     return false;
             }
         }
@@ -62,8 +63,9 @@ public class WaveFunctionCollapse
         return true;
     }
 
-    public void Propagate(int x, int y)
+    public void Propagate(int x, int y, int depth = 0)
     {
+        if (depth > 1) return;
         PropagateTimes++;
         var i = Image[x, y];
         var allIndex = i.GetAllIndex().ToList();
@@ -81,7 +83,7 @@ public class WaveFunctionCollapse
             {
                 toPropagate.Add((newX: newX1, newY: newY1));
                 Image[newX1, newY1] = @new;
-                TileSet.Validate(Image[newX1, newY1]);
+                TileSet.Validate(@new);
             }
         }
 
@@ -121,7 +123,7 @@ public class WaveFunctionCollapse
         {
             foreach (var (x1, y1) in toPropagate)
             {
-                Propagate(x1, y1);
+                Propagate(x1, y1, depth + 1);
             }
         }
     }

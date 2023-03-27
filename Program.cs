@@ -102,8 +102,13 @@ void CollapseTile(string name)
             {
                 // DrawOneTile(tileIndex, rotation, s);
                 var index = (tileIndex * 4 + rotation);
-                var bitSet = 1 << index;
+                var bitSet = 1L << index;
                 var neighbor = set.IndexToNeighbors[index];
+                // set.Validate(bitSet);
+                // set.Validate(neighbor[2]);
+                // set.Validate(neighbor[0]);
+                // set.Validate(neighbor[1]);
+                // set.Validate(neighbor[3]);
                 map[rotation * 3 + 1, tileIndex * 3 + 1] = bitSet;
                 map[rotation * 3 + 0, tileIndex * 3 + 1] = neighbor[2];
                 map[rotation * 3 + 2, tileIndex * 3 + 1] = neighbor[0];
@@ -113,24 +118,27 @@ void CollapseTile(string name)
         }
 
         var image = cache.Draw(map);
-        SaveImage(image, $"Neighbors");
+        SaveImage(image, $"{name}_Neighbors");
     }
 
-    // if (set.Tiles.Count * 4 <= 16)
-    TestNeighbors();
+    // TestNeighbors();
+    // var testCache = cache.TestImageBufferByBitSet();
+    // SaveImage(testCache, $"{name}_enlarged_cache");
+    // return;
     var waveFunctionCollapse = set.WaveFunctionCollapse(24, 24);
     var draw = cache.Draw(waveFunctionCollapse);
-    SaveImage(draw);
+    SaveImage(draw, $"{name}_Collapse");
 }
 
-foreach (var name in new[] {"Knots", "Rooms", "Castle", "Circles", /* "Circuit",*/ "FloorPlan",  "Summer" })
+// CollapseTile("Castle");
+// return;
+foreach (var name in new[] { "Rooms", "Castle", "Circles", "Knots", "Circuit", "FloorPlan", /*"Summer"*/ })
 {
-    
     try
     {
         CollapseTile(name);
     }
-    catch (NullReferenceException e)
+    catch (InvalidOperationException e)
     {
         Console.WriteLine($"{name} Collapse failed");
         Console.WriteLine(e);
