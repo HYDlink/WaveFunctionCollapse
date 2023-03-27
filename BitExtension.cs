@@ -14,7 +14,7 @@ public static class BitExtension
     }
 
     public static int ToIndex(this long bitSet) => GetAllIndex(bitSet).FirstOrDefault();
-    
+
     public static int RandomIndex(this long num, Random rand)
     {
         // randomly select a bit that is set to 1
@@ -25,6 +25,19 @@ public static class BitExtension
         } while (((num >> bitIndex) & 1) == 0); // continue until a 1 bit is found
 
         return bitIndex;
+    }
+
+    public static int CountOnes(this long x)
+    {
+        int count = 0;
+
+        while (x != 0)
+        {
+            x &= (x - 1L);
+            count++;
+        }
+
+        return count;
     }
 
     public static bool IsOnlyOneBit(this long bitset)

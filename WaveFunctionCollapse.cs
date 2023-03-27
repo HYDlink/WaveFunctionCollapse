@@ -35,6 +35,7 @@ public class WaveFunctionCollapse
         rand = new Random();
         while (!IsObserved(out var x, out var y))
         {
+            (x, y) = GetMinEntropyPos();
             CollapseTimes++;
             var formal = Image[x, y];
             var randomIndex = formal.RandomIndex(rand);
@@ -42,9 +43,31 @@ public class WaveFunctionCollapse
             Propagate(x, y);
 
             // 测试
-            // if (CollapseTimes > 1000)
+            // if (CollapseTimes > 100000)
             //     return;
         }
+    }
+
+    public (int x, int y) GetMinEntropyPos()
+    {
+        var minX = 0; 
+        var minY = 0;
+        var minCount = 64;
+        
+        for (var y = 0; y < Height; ++y)
+        for (var x = 0; x < Width; ++x)
+        {
+            var countOnes = Image[x, y].CountOnes();
+            if (countOnes == 2)
+                return (x, y);
+            if (countOnes > 1 && countOnes < minCount)
+            {
+                (minX, minY) = (x, y);
+                minCount = countOnes;
+            }
+        }
+
+        return (minX, minY);
     }
 
     public bool IsObserved(out int x, out int y)
