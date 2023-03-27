@@ -59,7 +59,7 @@ public class ImageCache
         }
     }
 
-    public Image<Bgra32> Draw(int[,] collapsedData)
+    public Image<Bgra32> Draw(long[,] collapsedData)
     {
         var width = collapsedData.GetLength(0);
         var height = collapsedData.GetLength(1);
@@ -82,6 +82,7 @@ public class ImageCache
                     var image_count = 0;
                     foreach (var index in ic.GetAllIndex())
                     {
+                        if (image_count >= 15) break;
                         var px = ImageWidth * 4 * x + ImageWidth * (image_count % 4);
                         var py = ImageHeight * 4 * y + ImageHeight * (image_count / 4);
                         image_count++;

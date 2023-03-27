@@ -84,7 +84,7 @@ public static class SymmetryHelper
     /// <param name="symmetry"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static int Encoding(this Symmetry symmetry)
+    public static long Encoding(this Symmetry symmetry)
         => symmetry switch
         {
             F or L or T => 0b1111,

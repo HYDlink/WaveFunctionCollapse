@@ -4,18 +4,18 @@ using System.Linq;
 
 public static class BitExtension
 {
-    public static IEnumerable<int> GetAllIndex(this int bitSet)
+    public static IEnumerable<int> GetAllIndex(this long bitset)
     {
-        for (int i = 0; (bitSet >> i) != 0; i++)
+        for (int i = 0; (bitset >> i) != 0; i++)
         {
-            if ((bitSet & (1 << i)) != 0)
+            if ((bitset & (1 << i)) != 0)
                 yield return i;
         }
     }
 
-    public static int ToIndex(this int bitSet) => GetAllIndex(bitSet).FirstOrDefault();
+    public static int ToIndex(this long bitSet) => GetAllIndex(bitSet).FirstOrDefault();
     
-    public static int RandomIndex(this int num, Random rand)
+    public static int RandomIndex(this long num, Random rand)
     {
         // randomly select a bit that is set to 1
         int bitIndex;
@@ -27,6 +27,6 @@ public static class BitExtension
         return bitIndex;
     }
 
-    public static bool IsOnlyOneBit(this int bitset)
+    public static bool IsOnlyOneBit(this long bitset)
         => (bitset != 0) && ((bitset & (bitset - 1)) == 0);
 }

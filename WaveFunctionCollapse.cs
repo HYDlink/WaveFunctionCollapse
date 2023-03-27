@@ -4,7 +4,7 @@ using System.Linq;
 
 public class WaveFunctionCollapse
 {
-    public int[,] Image;
+    public long[,] Image;
     public int Width { get; set; }
     public int Height { get; set; }
     public TileSet TileSet { get; set; }
@@ -15,7 +15,7 @@ public class WaveFunctionCollapse
         Height = height;
         TileSet = tileSet;
         var fullEncoding = tileSet.FullEncoding;
-        Image = new int[width, height];
+        Image = new long[width, height];
         for (int i = 0; i < height; i++)
         {
             for (int j = 0; j < width; j++)
@@ -42,8 +42,8 @@ public class WaveFunctionCollapse
             Propagate(x, y);
 
             // 测试
-            // if (CollapseTimes > 1000)
-            //     return;
+            if (CollapseTimes > 1000)
+                return;
         }
     }
 
@@ -68,12 +68,12 @@ public class WaveFunctionCollapse
         var i = Image[x, y];
         var allIndex = i.GetAllIndex().ToList();
 
-        int GetNeighborByDir(int dir)
-            => allIndex.Aggregate(0, (bit, index) => bit |= TileSet.IndexToNeighbors[index][dir]);
+        long GetNeighborByDir(int dir)
+            => allIndex.Aggregate(0L, (bit, index) => bit | TileSet.IndexToNeighbors[index][dir]);
 
         List<(int X, int Y)> toPropagate = new();
 
-        void PropagateAt(int newX1, int newY1, int neighbors1)
+        void PropagateAt(int newX1, int newY1, long neighbors1)
         {
             var formal = Image[newX1, newY1];
             var @new = formal & neighbors1;

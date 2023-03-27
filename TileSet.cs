@@ -16,19 +16,19 @@ public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> S
     public Tile GetTile(string name) => Tiles.FirstOrDefault(t => t.Name == name);
     public string TileFile(string tileName) => $"tilesets/{Name}/{tileName}.png";
 
-    public int FullEncoding = Tiles
-        .Select(t => t.Symmetry)
-        .Aggregate(0, (bit, sym) => bit << 4 | sym.Encoding());
+    public long FullEncoding = Tiles
+        .Select((t, i) => (t.Symmetry,i))
+        .Aggregate(0l, (bit, sym) => bit | (sym.Symmetry.Encoding() << (4 * sym.i)));
 
-    public bool isValidBitSet(int bitset) => (bitset & (~FullEncoding)) == 0;
+    public bool isValidBitSet(long bitset) => (bitset & (~FullEncoding)) == 0;
 
-    public void Validate(int bitset)
+    public void Validate(long bitset)
     {
         if (!isValidBitSet(bitset) || bitset == 0)
-            throw new Exception("Invalid bitset");
+            throw new InvalidOperationException("Invalid bitset");
     }
 
-    public void ValidateIndex(int index) => Validate(1 << index);
+    public void ValidateIndex(int index) => Validate(1l << index);
 
     public (Tile Tile, int Rotate) FromIndex(int index)
         => (Tiles[index / 4], index % 4);
@@ -36,7 +36,7 @@ public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> S
     public int ToIndex(string tileName, int rotate)
         => Tiles.FindIndex(t => t.Name == tileName) * 4 + rotate;
 
-    public IEnumerable<(Tile Tile, int Rotate)> FromEncoding(int encoding)
+    public IEnumerable<(Tile Tile, int Rotate)> FromEncoding(long encoding)
     {
         for (int i = 0; i < Tiles.Count * 4; i++)
         {
@@ -48,7 +48,7 @@ public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> S
     // Remarks 貌似抽象层次会让方法以 2^n 上涨，
     // 比如 (string tileName, int Rotate) 到 int encoding 的转换，
     // 这其中还能将第一个 string tileName 转换成 Tile tile
-    public Dictionary<int, int[]> IndexToNeighbors = new();
+    public Dictionary<int, long[]> IndexToNeighbors = new();
 
     private void InitNeighborsDict()
     {
@@ -58,7 +58,7 @@ public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> S
             var encoding = symmetry.Encoding();
             for (int j = 0; (1 << j & encoding) != 0; j++)
             {
-                IndexToNeighbors[i * 4 + j] = new int[4];
+                IndexToNeighbors[i * 4 + j] = new long[4];
             }
 
             i++;
@@ -79,9 +79,10 @@ public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> S
     {
         var index = ToIndex(centerName, rotate);
         ValidateIndex(index);
-        if (!IndexToNeighbors.ContainsKey(index)) return;
+        if (!IndexToNeighbors.ContainsKey(index)) throw new InvalidOperationException("Index not exists");
         var neighbors4d = IndexToNeighbors[index];
-        neighbors4d[direction] |= 1 << ToIndex(neighborName, neighborRotate);
+        neighbors4d[direction] |= 1L << ToIndex(neighborName, neighborRotate);
+        Validate(neighbors4d[direction]);
     }
 
 
@@ -157,7 +158,7 @@ public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> S
         return FromEncoding(encoding).ToList();
     }
 
-    public int[,] WaveFunctionCollapse(int width, int height)
+    public long[,] WaveFunctionCollapse(int width, int height)
     {
         var waveFunctionCollapse = new WaveFunctionCollapse(this, width, height);
         waveFunctionCollapse.Collapse();
