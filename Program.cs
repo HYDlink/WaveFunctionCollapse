@@ -71,7 +71,7 @@ void CollapseTile(string name)
     {
         var outputCornerX4Png = $"output\\{name}.png";
         outputImg.Save(outputCornerX4Png, new PngEncoder());
-        Process.Start(new ProcessStartInfo(outputCornerX4Png) { UseShellExecute = true });
+        // Process.Start(new ProcessStartInfo(outputCornerX4Png) { UseShellExecute = true });
     }
 
     var cache = new ImageCache(set);
@@ -118,16 +118,16 @@ void CollapseTile(string name)
         }
 
         var image = cache.Draw(map);
-        SaveImage(image, $"{name}_Neighbors");
+        SaveImage(image, $"Neighbors_{name}");
     }
 
-    // TestNeighbors();
+    TestNeighbors();
     // var testCache = cache.TestImageBufferByBitSet();
     // SaveImage(testCache, $"{name}_enlarged_cache");
     // return;
     var waveFunctionCollapse = set.WaveFunctionCollapse(24, 24);
     var draw = cache.Draw(waveFunctionCollapse);
-    SaveImage(draw, $"{name}_Collapse");
+    SaveImage(draw, $"Collapse_{name}");
 }
 
 // CollapseTile("Castle");
