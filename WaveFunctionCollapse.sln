@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WFC.GUI", "WFC.GUI\WFC.GUI.csproj", "{4E009624-08D9-48A2-9255-45F4742ADD55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WaveFunctionCollapse", "WaveFunctionCollapse\WaveFunctionCollapse.csproj", "{DD7AD5C1-4CEA-4C10-A22D-B6235087C6E6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4E009624-08D9-48A2-9255-45F4742ADD55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E009624-08D9-48A2-9255-45F4742ADD55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E009624-08D9-48A2-9255-45F4742ADD55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E009624-08D9-48A2-9255-45F4742ADD55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD7AD5C1-4CEA-4C10-A22D-B6235087C6E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD7AD5C1-4CEA-4C10-A22D-B6235087C6E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD7AD5C1-4CEA-4C10-A22D-B6235087C6E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD7AD5C1-4CEA-4C10-A22D-B6235087C6E6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

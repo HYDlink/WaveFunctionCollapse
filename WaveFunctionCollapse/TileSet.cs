@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+namespace WaveFunctionCollapse;
 
 public record Tile(string Name, Symmetry Symmetry);
 
@@ -14,7 +15,8 @@ public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> S
 {
     public string Name { get; set; }
     public Tile GetTile(string name) => Tiles.FirstOrDefault(t => t.Name == name);
-    public string TileFile(string tileName) => $"tilesets/{Name}/{tileName}.png";
+    public string TileSetDirectory { get; set; } = "tilesets";
+    public string GetTileFilePath(string tileName) => $"{TileSetDirectory}/{Name}/{tileName}.png";
 
     public long FullEncoding = Tiles
         .Select((t, i) => (t.Symmetry,i))

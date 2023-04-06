@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net7.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWPF>true</UseWPF>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\WaveFunctionCollapse\WaveFunctionCollapse.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+<!--	    <Resource Include="Resources\**" />-->
+<!--	    <Resource Include="Resources\*" />-->
+        <None Include="Resources\*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+</Project>

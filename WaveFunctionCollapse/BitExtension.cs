@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+namespace WaveFunctionCollapse;
+
 public static class BitExtension
 {
     public static IEnumerable<int> GetAllIndex(this long bitset)

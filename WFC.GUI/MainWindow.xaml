@@ -1,0 +1,44 @@
+﻿<Window x:Class="WFC.GUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WFC.GUI"
+        mc:Ignorable="d"
+        Name="Root"
+        Title="MainWindow" SizeToContent="WidthAndHeight">
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <local:BitsetToImageSourceConverter x:Key="BitsetToImage"></local:BitsetToImageSourceConverter>
+    </Window.Resources>
+    <Grid>
+        <ItemsControl ItemsSource="{Binding ImageBitset}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ContentPresenter>
+                        <ContentPresenter.Content>
+                            <MultiBinding Converter="{StaticResource BitsetToImage}">
+                                <Binding/>
+                                <Binding ElementName="Root" Path="DataContext.ImageCacheWpf"/>
+                            </MultiBinding>
+                        </ContentPresenter.Content>
+                    </ContentPresenter>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <!--<ItemsControl ItemsSource="{Binding ImageCacheWpf.ImagesObservable}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>-->
+    </Grid>
+</Window>

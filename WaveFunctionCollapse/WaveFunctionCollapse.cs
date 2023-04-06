@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+namespace WaveFunctionCollapse;
+
 public class WaveFunctionCollapse
 {
     public long[,] Image;
@@ -59,6 +61,8 @@ public class WaveFunctionCollapse
             // if (CollapseTimes > 100000)
             //     return;
         }
+
+        Console.WriteLine($"Collapse Times for \"{TileSet.Name}\": {CollapseTimes}");
     }
 
     public (int x, int y) GetMinEntropyPos()

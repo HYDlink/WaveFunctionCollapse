@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
-public class ImageCache
+namespace WaveFunctionCollapse;
+
+public class ImageCache: IDisposable
 {
     public Image<Bgra32>[] OriginalImage;
     public Image<Bgra32>[] EnlargedImage;
@@ -33,7 +36,7 @@ public class ImageCache
         int ti = 0;
         foreach (var (name, symmetry) in tileSet.Tiles)
         {
-            var imgFilename = tileSet.TileFile(name);
+            var imgFilename = tileSet.GetTileFilePath(name);
             var image = Image.Load<Bgra32>(imgFilename);
             (ImageWidth, ImageHeight) = (image.Width, image.Height);
             var (lw, lh) = (ImageWidth * 4, ImageHeight * 4);
@@ -133,5 +136,13 @@ public class ImageCache
         }
 
         return image;
+    }
+
+    public void Dispose()
+    {
+        foreach (var image in EnlargedImage.Concat(OriginalImage).OfType<Image<Bgra32>>())
+        {
+            image.Dispose();
+        }
     }
 }
