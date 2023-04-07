@@ -11,15 +11,19 @@ public record Neighbor(string Left, int LeftRotate, string Right, int RightRotat
 public record Subset(string Name, List<string> Tiles);
 
 // Tiles 没有强制 DistinctBy Name
-public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> Subsets)
+public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> Subsets, bool IsUnique = false)
 {
     public string Name { get; set; }
     public Tile GetTile(string name) => Tiles.FirstOrDefault(t => t.Name == name);
     public string TileSetDirectory { get; set; } = "tilesets";
-    public string GetTileFilePath(string tileName) => $"{TileSetDirectory}/{Name}/{tileName}.png";
+    public string GetTileFilePath(string tileName, int rotate = 0)
+    {
+        var fileName = (IsUnique ? $"{tileName} {rotate}" : tileName);
+        return $"{TileSetDirectory}/{Name}/{fileName}.png";
+    }
 
     public long FullEncoding = Tiles
-        .Select((t, i) => (t.Symmetry,i))
+        .Select((t, i) => (t.Symmetry, i))
         .Aggregate(0l, (bit, sym) => bit | (sym.Symmetry.Encoding() << (4 * sym.i)));
 
     public bool isValidBitSet(long bitset) => (bitset & (~FullEncoding)) == 0;
@@ -119,7 +123,7 @@ public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> S
                     this.AddNeighbor(rightName, cur_right_rotate, (i + 2) % 4, name, cur_left_rotate);
                 }
             }
-            
+
             AddWithRotationAndRelative(leftRotate, rightRotate);
 
             var rotateWithSameRightEdge = left_sym.GetRotateWithSameRightEdge(leftRotate);

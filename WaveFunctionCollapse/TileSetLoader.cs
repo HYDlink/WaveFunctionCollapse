@@ -27,7 +27,8 @@ public static class TileSetLoader
                     var (rightName, rightRotate) = ParseTileName(neighbor.Attribute("right").Value);
                     return new Neighbor(leftName, leftRotate, rightName, rightRotate);
                 }).ToList(),
-            null
+            null,
+            xroot.Attribute("unique") is { Value: "True"}
             // xroot.Element("subsets").Descendants()
             //     .Select(s => new Subset(
             //         s.Attribute("name").Value,

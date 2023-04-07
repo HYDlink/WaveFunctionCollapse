@@ -8,7 +8,7 @@ using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
 namespace WFC.Core;
 
-public class ImageCache: IDisposable
+public class ImageCache : IDisposable
 {
     public Image<Bgra32>[] OriginalImage;
     public Image<Bgra32>[] EnlargedImage;
@@ -51,7 +51,9 @@ public class ImageCache: IDisposable
             for (int i = 1; i < symmetry.RotationCount(); i++)
             {
                 var index = ti * 4 + i;
-                var newI = image.Clone();
+                var newI = tileSet.IsUnique
+                    ? Image.Load<Bgra32>(tileSet.GetTileFilePath(name, i)) 
+                    : image.Clone();
                 var rotate = ToRotateMode(i);
                 newI.Mutate(x => x.Rotate(rotate));
                 var rEnlarged = newI.Clone();

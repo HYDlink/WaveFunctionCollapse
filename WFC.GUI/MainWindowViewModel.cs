@@ -64,9 +64,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     public void TestSource()
     {
-        var name = "Knots";
+        var name = "Summer";
         //var file_name = $"Resources/tilesets/{name}.xml";
-        var file_name = @"C:\Work\Projects\WaveFunctionCollapse\WFC.GUI\Resources\tilesets\Knots.xml";
+        var file_name = $@"C:\Work\Projects\WaveFunctionCollapse\WFC.GUI\Resources\tilesets\{name}.xml";
         TileSet = TileSetLoader.LoadFromFile(name, file_name);
         var image_source_converter = new ImageSourceConverter();
         var image_sources = TileSet.Tiles.Select(t => image_source_converter.ConvertFromString(TileSet.GetTileFilePath(t.Name))).OfType<ImageSource>();

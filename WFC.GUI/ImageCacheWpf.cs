@@ -55,7 +55,9 @@ public class ImageCacheWpf
                 var index = ti * 4 + i;
                 var rotateImage = new BitmapImage();
                 rotateImage.BeginInit();
-                rotateImage.UriSource = uri;
+                rotateImage.UriSource = tileSet.IsUnique
+                    ? new Uri(tileSet.GetTileFilePath(name, i))
+                    : uri;
                 rotateImage.Rotation = ToRotateMode(i);
                 rotateImage.EndInit();
 
