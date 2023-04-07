@@ -11,9 +11,49 @@
         <local:MainWindowViewModel/>
     </Window.DataContext>
     <Window.Resources>
-        <local:BitsetToImageSourceConverter x:Key="BitsetToImage"></local:BitsetToImageSourceConverter>
+        <local:BitsetToImageSourceConverter x:Key="BitsetToImage" />
+
+        <DataTemplate DataType="{x:Type ImageSource}">
+            <Image Margin="2" Width="16" Height="16"
+                       Source="{Binding}"/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type local:ImageList}">
+            <ItemsControl ItemsSource="{Binding}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="4" Rows="4"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Padding="0" Margin="0.5">
+                            <Image Width="8" Height="8"
+                               Source="{Binding}">
+                            </Image>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </DataTemplate>
     </Window.Resources>
-    <Grid>
+    <DockPanel>
+        <ItemsControl DockPanel.Dock="Left" ItemsSource="{Binding ImageCacheWpf.ImagesObservable}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Image Margin="2" Width="16" Height="16"
+                           Source="{Binding}"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Border VerticalAlignment="Stretch" Width="2" Background="Aquamarine"/>
+
         <ItemsControl ItemsSource="{Binding ImageBitset}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -33,12 +73,23 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <!--<ItemsControl ItemsSource="{Binding ImageCacheWpf.ImagesObservable}">
+
+        <ItemsControl Name="BitsetDebugView" DockPanel.Dock="Right" Visibility="Collapsed"
+                      ItemsSource="{Binding ImageBitset}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-        </ItemsControl>-->
-    </Grid>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ContentPresenter Margin="2">
+                        <ContentPresenter.Content>
+                            <Binding/>
+                        </ContentPresenter.Content>
+                    </ContentPresenter>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </DockPanel>
 </Window>

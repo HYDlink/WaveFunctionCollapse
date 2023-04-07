@@ -16,8 +16,8 @@ namespace WFC.GUI;
 
 public class ImageCacheWpf
 {
-    public Image[] Images;
-    public ObservableCollection<Image> ImagesObservable => new(Images);
+    public ImageSource[] Images;
+    public ObservableCollection<ImageSource> ImagesObservable => new(Images);
 
     public int ImageWidth;
     public int ImageHeight;
@@ -35,7 +35,7 @@ public class ImageCacheWpf
     public ImageCacheWpf(TileSet tileSet)
     {
         TileSet = tileSet;
-        Images = new Image[tileSet.Tiles.Count * 4];
+        Images = new ImageSource[tileSet.Tiles.Count * 4];
 
         int ti = 0;
         var converter = new ImageSourceConverter();
@@ -47,8 +47,7 @@ public class ImageCacheWpf
             var imgSource = new BitmapImage(uri);
             if (imgSource == null)
                 throw new FileNotFoundException($"ImageSource not found for {imgFilename}");
-            var image = new Image() { Source = imgSource, Width = 16, Height = 16 };
-            Images[ti * 4] = image;
+            Images[ti * 4] = imgSource;
 
 
             for (int i = 1; i < symmetry.RotationCount(); i++)
@@ -59,13 +58,8 @@ public class ImageCacheWpf
                 rotateImage.UriSource = uri;
                 rotateImage.Rotation = ToRotateMode(i);
                 rotateImage.EndInit();
-                var newI = new Image()
-                {
-                    Source = rotateImage,
-                    Width = 16,
-                    Height = 16,
-                };
-                Images[index] = newI;
+
+                Images[index] = rotateImage;
             }
 
             ti++;

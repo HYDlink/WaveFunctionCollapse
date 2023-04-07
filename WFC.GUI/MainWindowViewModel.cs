@@ -65,7 +65,12 @@ public class MainWindowViewModel
             return 1L << allIndex[random.Next(allIndex.Count)];
         }
 
-        var randBits = Enumerable.Repeat(0, width * height).Select(_ => RandBit());
+        long RandBits()
+        {
+            return random.NextInt64(TileSet.FullEncoding) & TileSet.FullEncoding;
+        }
+
+        var randBits = Enumerable.Repeat(0, width * height).Select(_ => RandBits());
         ImageBitset = new(randBits);
     }
 }
