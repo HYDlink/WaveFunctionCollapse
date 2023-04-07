@@ -14,23 +14,25 @@
         <local:BitsetToImageSourceConverter x:Key="BitsetToImage" />
 
         <DataTemplate DataType="{x:Type ImageSource}">
-            <Image Margin="2" Width="16" Height="16"
-                       Source="{Binding}"/>
+            <Image Margin="2" Width="48" Height="48"
+                   RenderOptions.BitmapScalingMode="NearestNeighbor"
+                   Source="{Binding}"/>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type local:ImageList}">
             <ItemsControl ItemsSource="{Binding}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid Columns="4" Rows="4"/>
+                        <UniformGrid Columns="4" Rows="4" Background="Bisque"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Padding="0" Margin="0.5">
-                            <Image Width="8" Height="8"
-                               Source="{Binding}">
-                            </Image>
+                        <Button Name="TileSelectBtn" Tag="{Binding Index}"
+                                Padding="0" Margin="0.5"
+                                Click="TileSelectBtn_OnClick">
+                            <Image Width="10" Height="10"
+                               Source="{Binding ImageSource}"/>
                         </Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -38,7 +40,34 @@
         </DataTemplate>
     </Window.Resources>
     <DockPanel>
-        <ItemsControl DockPanel.Dock="Left" ItemsSource="{Binding ImageCacheWpf.ImagesObservable}">
+
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+                <Label>高度</Label>
+                <TextBox Width="32" Text="{Binding Width}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>宽度</Label>
+                <TextBox Width="32" Text="{Binding Height}"/>
+            </StackPanel>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button Name="RandomStepBtn" Click="RandomStepBtn_OnClick">随机</Button>
+                    <TextBox Width="32" Text="{Binding NextStepCount, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Label>步</Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button Name="RandomBackBtn" Click="RandomBackBtn_OnClick">回退</Button>
+                    <TextBox Width="32" Text="{Binding BackStepCount, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Label>步</Label>
+                </StackPanel>
+                <Button Name="RandomToEndBtn" Click="RandomToEndBtn_OnClick">随机到底</Button>
+                <Button Name="ResetBtn" Click="ResetBtn_OnClick">重置</Button>
+            </StackPanel>
+        </StackPanel>
+
+        <ItemsControl DockPanel.Dock="Left" Visibility="Collapsed"
+                      ItemsSource="{Binding ImageCacheWpf.ImagesObservable}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid/>
@@ -57,12 +86,12 @@
         <ItemsControl ItemsSource="{Binding ImageBitset}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid/>
+                    <UniformGrid Background="Aquamarine"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <ContentPresenter>
+                    <ContentPresenter Name="TileHolderContent" Margin="2" DataContext="{Binding}">
                         <ContentPresenter.Content>
                             <MultiBinding Converter="{StaticResource BitsetToImage}">
                                 <Binding/>

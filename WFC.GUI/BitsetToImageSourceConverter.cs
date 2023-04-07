@@ -5,18 +5,22 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using WaveFunctionCollapse;
+using WFC.Core;
 using YamlDotNet.Core.Tokens;
 
 namespace WFC.GUI;
 
-public class ImageList : List<ImageSource> { }
+public record ImageInfo(ImageSource ImageSource, int Index);
 
-public class BitsetToImageSourceConverter: IMultiValueConverter
+public class ImageList : List<ImageInfo>
+{
+}
+
+public class BitsetToImageSourceConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
-        if (values is [long bitset and > 0, ImageCacheWpf cache] )
+        if (values is [long bitset and > 0, ImageCacheWpf cache])
         {
             if (bitset.IsOnlyOneBit())
             {
@@ -25,7 +29,8 @@ public class BitsetToImageSourceConverter: IMultiValueConverter
             else
             {
                 var imageList = new ImageList();
-                var imageSources = bitset.GetAllIndex().Select(i => cache.Images[i]);
+                var imageSources = bitset.GetAllIndex()
+                    .Select(i => new ImageInfo(cache.Images[i], i));
                 imageList.AddRange(imageSources);
                 return imageList;
             }

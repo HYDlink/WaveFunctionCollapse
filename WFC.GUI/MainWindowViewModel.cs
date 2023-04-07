@@ -5,11 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using WaveFunctionCollapse;
+using CommunityToolkit.Mvvm.ComponentModel;
+using WFC.Core;
+using WaveFunctionCollapse = WFC.Core.WaveFunctionCollapse;
 
 namespace WFC.GUI;
 
-public class MainWindowViewModel
+public partial class MainWindowViewModel : ObservableObject
 {
     public ObservableCollection<ImageSource> TileImages { get; set; }
 
@@ -31,14 +33,33 @@ public class MainWindowViewModel
         @"C:\Work\Projects\WaveFunctionCollapse\WFC.GUI\Resources\tilesets\Circuit\wire.png",
     };
 
-    public ObservableCollection<long> ImageBitset { get; set; }
+    [ObservableProperty]
+    public long[] imageBitset;
 
     public ImageCacheWpf ImageCacheWpf { get; set; }
     public TileSet TileSet { get; set; }
+    public WaveFunctionCollapse WFC { get; set; }
+
+    [ObservableProperty]
+    public int width = 16;
+    [ObservableProperty]
+    public int height = 16;
+    [ObservableProperty]
+    public bool canChangeWidthHeight = true;
+
+    [ObservableProperty]
+    public int backStepCount = 1;
+    [ObservableProperty]
+    public int nextStepCount = 1;
 
     public MainWindowViewModel()
     {
         TestSource();
+    }
+
+    public void UpdateImageBitSetByWFC()
+    {
+        ImageBitset = WFC.Image.Cast<long>().ToArray();
     }
 
     public void TestSource()
@@ -51,7 +72,12 @@ public class MainWindowViewModel
         var image_sources = TileSet.Tiles.Select(t => image_source_converter.ConvertFromString(TileSet.GetTileFilePath(t.Name))).OfType<ImageSource>();
         TileImages = new(image_sources);
         ImageCacheWpf = new ImageCacheWpf(TileSet);
-        GenerateRandomBitSet(16, 16);
+
+        // GenerateRandomBitSet(16, 16);
+        WFC = new WaveFunctionCollapse(TileSet, width, height);
+        
+        imageBitset = WFC.Image.Cast<long>().ToArray();
+        canChangeWidthHeight = false;
     }
 
     public void GenerateRandomBitSet(int width, int height)
@@ -71,6 +97,14 @@ public class MainWindowViewModel
         }
 
         var randBits = Enumerable.Repeat(0, width * height).Select(_ => RandBits());
-        ImageBitset = new(randBits);
+        imageBitset = randBits.ToArray();
+    }
+
+    public void Reset()
+    {
+        WFC.Width = width;
+        WFC.Height = height;
+        WFC.Reset();
+        UpdateImageBitSetByWFC();
     }
 }

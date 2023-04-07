@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace WaveFunctionCollapse;
+namespace WFC.Core;
 
 public class WaveFunctionCollapse
 {
@@ -16,53 +16,91 @@ public class WaveFunctionCollapse
         Width = width;
         Height = height;
         TileSet = tileSet;
-        var fullEncoding = tileSet.FullEncoding;
-        Image = new long[width, height];
-        for (int i = 0; i < height; i++)
-        {
-            for (int j = 0; j < width; j++)
-            {
-                Image[j, i] = fullEncoding;
-            }
-        }
+
+        Reset();
     }
 
     private Random rand;
 
     public int CollapseTimes = 0;
     public int PropagateTimes = 0;
+    private Stack<long[,]> Stack { get; set; }
 
-    public void Collapse()
+    public void Reset()
     {
-        rand = new Random();
-        var stack = new Stack<long[,]>();
-
-        void Collapse(int x, int y)
+        var fullEncoding = TileSet.FullEncoding;
+        Image = new long[Height, Width];
+        for (int y = 0; y < Height; y++)
         {
-            CollapseTimes++;
-            var formal = Image[x, y];
-            var randomIndex = formal.RandomIndex(rand);
-            Image[x, y] = 1L << randomIndex;
-            if (!Propagate(x, y))
-                Image = stack.Pop();
-            else
-                stack.Push(Image);
+            for (int x = 0; x < Width; x++)
+            {
+                Image[y, x] = fullEncoding;
+            }
         }
 
+        rand = new Random();
+        Stack = new Stack<long[,]>();
+    }
+
+    public void CollapseByRandomIndex(int x, int y)
+    {
+        var formal = Image[y, x];
+        var randomIndex = formal.RandomIndex(rand);
+        Collapse(x, y, randomIndex);
+    }
+
+    public void Collapse(int x, int y, int index)
+    {
+        Stack.Push((long[,])Image.Clone());
+        Image[y, x] = 1L << index;
+        CollapseTimes++;
+        if (!Propagate(x, y))
+        {
+            BackTrack(1);
+        }
+    }
+
+
+    public void CollapseRandomToEnd()
+    {
         var (firstX, firstY) = (rand.Next(Width), rand.Next(Height));
-        Collapse(firstX, firstY);
+        CollapseByRandomIndex(firstX, firstY);
 
         while (!IsObserved(out var x, out var y))
         {
-            (x, y) = GetMinEntropyPos();
-
-            Collapse(x, y);
+            CollapseRandomNext();
             // 测试
             // if (CollapseTimes > 100000)
             //     return;
         }
 
-        Console.WriteLine($"Collapse Times for \"{TileSet.Name}\": {CollapseTimes}");
+        Console.WriteLine($"CollapseByRandomIndex Times for \"{TileSet.Name}\": {CollapseTimes}");
+    }
+
+    public void CollapseRandomNext(int steps)
+    {
+        for (int i = 0; i < steps && !IsObserved(out _, out _); i++)
+        {
+            var (x, y) = GetMinEntropyPos();
+
+            CollapseByRandomIndex(x, y);
+        }
+    }
+
+    public void CollapseRandomNext()
+    {
+        var (x, y) = GetMinEntropyPos();
+
+        CollapseByRandomIndex(x, y);
+    }
+    public void BackTrack(int steps)
+    {
+        long[,] popedItem = null;
+        for (int i = 0; i < steps && Stack.Any(); i++)
+        {
+            popedItem = Stack.Pop();
+        }
+        Image = (long[,])popedItem.Clone();
     }
 
     public (int x, int y) GetMinEntropyPos()
@@ -72,17 +110,17 @@ public class WaveFunctionCollapse
         var minCount = 64;
 
         for (var y = 0; y < Height; ++y)
-        for (var x = 0; x < Width; ++x)
-        {
-            var countOnes = Image[x, y].CountOnes();
-            if (countOnes == 2)
-                return (x, y);
-            if (countOnes > 1 && countOnes < minCount)
+            for (var x = 0; x < Width; ++x)
             {
-                (minX, minY) = (x, y);
-                minCount = countOnes;
+                var countOnes = Image[y, x].CountOnes();
+                if (countOnes == 2)
+                    return (x, y);
+                if (countOnes > 1 && countOnes < minCount)
+                {
+                    (minX, minY) = (x, y);
+                    minCount = countOnes;
+                }
             }
-        }
 
         return (minX, minY);
     }
@@ -94,7 +132,7 @@ public class WaveFunctionCollapse
         {
             for (x = 0; x < Width; x++)
             {
-                var bitSet = Image[x, y];
+                var bitSet = Image[y, x];
                 if (bitSet != 0 && !bitSet.IsOnlyOneBit())
                     return false;
             }
@@ -107,7 +145,7 @@ public class WaveFunctionCollapse
     {
         // if (depth > 1) return true;
         PropagateTimes++;
-        var i = Image[x, y];
+        var i = Image[y, x];
         var allIndex = i.GetAllIndex().ToList();
 
         long GetNeighborByDir(int dir)
@@ -117,13 +155,13 @@ public class WaveFunctionCollapse
 
         bool PropagateAt(int newX1, int newY1, long neighbors1)
         {
-            var formal = Image[newX1, newY1];
+            var formal = Image[newY1, newX1];
             var @new = formal & neighbors1;
             if (@new == 0) return false;
             if (formal != @new)
             {
                 toPropagate.Add((newX: newX1, newY: newY1));
-                Image[newX1, newY1] = @new;
+                Image[newY1, newX1] = @new;
                 TileSet.Validate(@new);
             }
 

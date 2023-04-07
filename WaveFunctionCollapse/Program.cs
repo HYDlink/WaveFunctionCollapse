@@ -6,7 +6,7 @@ using System.Xml.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
-using WaveFunctionCollapse;
+using WFC.Core;
 
 partial class Program
 {
@@ -103,7 +103,7 @@ partial class Program
             }
             catch (InvalidOperationException e)
             {
-                Console.WriteLine($"{name} Collapse failed");
+                Console.WriteLine($"{name} CollapseByRandomIndex failed");
                 Console.WriteLine(e);
             }
         }

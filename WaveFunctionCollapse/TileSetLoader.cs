@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace WaveFunctionCollapse;
+namespace WFC.Core;
 
 public static class TileSetLoader
 {

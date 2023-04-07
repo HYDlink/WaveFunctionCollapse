@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace WaveFunctionCollapse;
+namespace WFC.Core;
 
 public static class BitExtension
 {

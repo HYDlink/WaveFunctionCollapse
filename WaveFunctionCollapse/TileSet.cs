@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace WaveFunctionCollapse;
+namespace WFC.Core;
 
 public record Tile(string Name, Symmetry Symmetry);
 
@@ -163,7 +163,7 @@ public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> S
     public long[,] WaveFunctionCollapse(int width, int height)
     {
         var waveFunctionCollapse = new WaveFunctionCollapse(this, width, height);
-        waveFunctionCollapse.Collapse();
+        waveFunctionCollapse.CollapseRandomToEnd();
         return waveFunctionCollapse.Image;
     }
 };
