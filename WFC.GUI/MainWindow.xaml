@@ -42,6 +42,7 @@
     <DockPanel>
 
         <StackPanel Orientation="Vertical">
+            <ComboBox SelectedItem="{Binding SelectedSet}" ItemsSource="{Binding SelectableSets}"/>
             <StackPanel Orientation="Horizontal">
                 <Label>高度</Label>
                 <TextBox Width="32" Text="{Binding Width}"/>

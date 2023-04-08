@@ -51,11 +51,15 @@ public class ImageCache : IDisposable
             for (int i = 1; i < symmetry.RotationCount(); i++)
             {
                 var index = ti * 4 + i;
-                var newI = tileSet.IsUnique
-                    ? Image.Load<Bgra32>(tileSet.GetTileFilePath(name, i)) 
-                    : image.Clone();
-                var rotate = ToRotateMode(i);
-                newI.Mutate(x => x.Rotate(rotate));
+                Image<Bgra32> newI;
+                if (tileSet.IsUnique)
+                    newI = Image.Load<Bgra32>(tileSet.GetTileFilePath(name, i));
+                else
+                {
+                    newI = image.Clone();
+                    var rotate = ToRotateMode(i);
+                    newI.Mutate(x => x.Rotate(rotate));
+                }
                 var rEnlarged = newI.Clone();
                 rEnlarged.Mutate(c => c.Resize(lw, lh, new NearestNeighborResampler()));
                 OriginalImage[index] = newI;

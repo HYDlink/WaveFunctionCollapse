@@ -109,36 +109,31 @@ public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> S
         {
             var right_sym = GetTile(rightName).Symmetry;
 
-            void AddWithRotationAndRelative(int lRotate, int rRotate)
-            {
-                AddNeighborDirectly(lRotate, 0, rightName, rRotate);
-                this.AddNeighbor(rightName, rRotate, 2, name, lRotate);
-
-                // 同时加上左侧不同旋转以后，旋转方向上的邻居
-                for (int i = 1; i < 4; i++)
-                {
-                    var cur_left_rotate = left_sym.GetOriginalRotate((lRotate + i) % 4);
-                    var cur_right_rotate = right_sym.GetOriginalRotate((rRotate + i) % 4);
-                    AddNeighborDirectly(cur_left_rotate, i, rightName, cur_right_rotate);
-                    this.AddNeighbor(rightName, cur_right_rotate, (i + 2) % 4, name, cur_left_rotate);
-                }
-            }
-
-            AddWithRotationAndRelative(leftRotate, rightRotate);
+            AddWithRotationAndRelative(leftRotate, rightRotate, name, rightName, left_sym, right_sym);
 
             var rotateWithSameRightEdge = left_sym.GetRotateWithSameRightEdge(leftRotate);
             if (rotateWithSameRightEdge != -1)
             {
-                AddWithRotationAndRelative(rotateWithSameRightEdge, rightRotate);
+                AddWithRotationAndRelative(rotateWithSameRightEdge, rightRotate, name, rightName, left_sym, right_sym);
             }
 
             // 求自身旋转以后右侧边缘依然相同的性质
             if (left_sym.IsRightEdgeVerticalSymmetry(leftRotate))
             {
                 var v_flip_rotate = right_sym.GetRotateByVerticalFlip(rightRotate);
-                if (v_flip_rotate != -1 && v_flip_rotate != leftRotate)
+                if (v_flip_rotate != -1 && v_flip_rotate != rightRotate)
                 {
-                    AddWithRotationAndRelative(leftRotate, v_flip_rotate);
+                    AddWithRotationAndRelative(leftRotate, v_flip_rotate, name, rightName, left_sym, right_sym);
+                }
+            }
+
+            // 求出水平对称下，左侧的邻居，会出现 T┐ 这样的布局，实际上可以根据 T 的水平对称性，T 的右侧可以是 ┐ 的旋转，T┐ -> LT
+            if (left_sym.IsHorizontalSymmetry(leftRotate))
+            {
+                var h_flip_rotate = right_sym.GetRotateByHorizontalFlip(rightRotate);
+                if (h_flip_rotate != -1 && h_flip_rotate != leftRotate)
+                {
+                    AddWithRotationAndRelative(h_flip_rotate, leftRotate, rightName, name, right_sym, left_sym);
                 }
             }
         }
@@ -153,6 +148,21 @@ public record TileSet(List<Tile> Tiles, List<Neighbor> Neighbors, List<Subset> S
 
 
         // 将右侧的邻居应用到不同旋转的情况上，在应用的过程中，同时为邻居的邻居数据添加上自己
+    }
+
+    private void AddWithRotationAndRelative(int lRotate, int rRotate, string leftName, string rightName, Symmetry left_sym, Symmetry right_sym)
+    {
+        this.AddNeighbor(leftName, lRotate, 0, rightName, rRotate);
+        this.AddNeighbor(rightName, rRotate, 2, leftName, lRotate);
+
+        // 同时加上左侧不同旋转以后，旋转方向上的邻居
+        for (int i = 1; i < 4; i++)
+        {
+            var cur_left_rotate = left_sym.GetOriginalRotate((lRotate + i) % 4);
+            var cur_right_rotate = right_sym.GetOriginalRotate((rRotate + i) % 4);
+            this.AddNeighbor(leftName, cur_left_rotate, i, rightName, cur_right_rotate);
+            this.AddNeighbor(rightName, cur_right_rotate, (i + 2) % 4, leftName, cur_left_rotate);
+        }
     }
 
     public List<(Tile Tile, int Rotate)> GetNeighbors(string curTileName, int rotate = 0, int neighborDir = 0)

@@ -10,18 +10,17 @@ using WFC.Core;
 
 partial class Program
 {
+    static void ClearOutputDir()
+    {
+        var folder = Directory.CreateDirectory("output");
+        foreach (var file in folder.GetFiles()) file.Delete();
+    }
 
     static void CollapseTile(string name)
     {
-        var set = TileSetLoader.Load(name);
+        var file_name = $@"C:\Work\Projects\WaveFunctionCollapse\WFC.GUI\Resources\tilesets\{name}.xml";
+        var set = TileSetLoader.LoadFromFile(name, file_name);
 
-        string TileFile(string name, string tileName) => $"tilesets/{name}/{tileName}.png";
-
-        void ClearOutputDir()
-        {
-            var folder = Directory.CreateDirectory("output");
-            foreach (var file in folder.GetFiles()) file.Delete();
-        }
 
         void SaveImage(Image<Bgra32> outputImg, string name = "corner")
         {
@@ -34,7 +33,7 @@ partial class Program
 
         void DrawOneTile(int tileIndex, int rotation, string s1)
         {
-            var map = new long [3, 3];
+            var map = new long[3, 3];
             var index = (tileIndex * 4 + rotation);
             var bitSet = 1 << index;
             var neighbor = set.IndexToNeighbors[index];
@@ -80,20 +79,19 @@ partial class Program
         TestNeighbors();
         // var testCache = cache.TestImageBufferByBitSet();
         // SaveImage(testCache, $"{name}_enlarged_cache");
-        // return;
         var waveFunctionCollapse = set.WaveFunctionCollapse(24, 24);
         var draw = cache.Draw(waveFunctionCollapse);
         SaveImage(draw, $"Collapse_{name}");
     }
 
-    static void Main_1()
+    static void Main()
     {
-
-// CollapseTile("Castle");
-// return;
+        ClearOutputDir();
+        // CollapseTile("Castle");
+        // return;
         foreach (var name in new[]
                  {
-                     "Rooms", "Castle", "Circles", "Knots", "Circuit", "FloorPlan", /*"Summer"*/
+                     "Rooms", "Castle", "Circles", "Knots", "Circuit", "FloorPlan", "Summer"
                  })
 
         {

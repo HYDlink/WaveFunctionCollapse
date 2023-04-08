@@ -95,6 +95,7 @@ public class WaveFunctionCollapse
     }
     public void BackTrack(int steps)
     {
+        if (!Stack.Any()) return;
         long[,] popedItem = null;
         for (int i = 0; i < steps && Stack.Any(); i++)
         {

@@ -52,9 +52,16 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     public int nextStepCount = 1;
 
+    [ObservableProperty] public ObservableCollection<string> selectableSets = new()
+    {
+        "Rooms", "Castle", "Knots", "Circuit", "FloorPlan", "Summer"
+    };
+
+    [ObservableProperty] public string selectedSet = "Rooms";
+
     public MainWindowViewModel()
     {
-        TestSource();
+        LoadTileSet();
     }
 
     public void UpdateImageBitSetByWFC()
@@ -62,9 +69,9 @@ public partial class MainWindowViewModel : ObservableObject
         ImageBitset = WFC.Image.Cast<long>().ToArray();
     }
 
-    public void TestSource()
+    public void LoadTileSet()
     {
-        var name = "Summer";
+        var name = selectedSet;
         //var file_name = $"Resources/tilesets/{name}.xml";
         var file_name = $@"C:\Work\Projects\WaveFunctionCollapse\WFC.GUI\Resources\tilesets\{name}.xml";
         TileSet = TileSetLoader.LoadFromFile(name, file_name);
@@ -102,6 +109,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     public void Reset()
     {
+        LoadTileSet();
+        UpdateImageBitSetByWFC();
+        return;
         WFC.Width = width;
         WFC.Height = height;
         WFC.Reset();

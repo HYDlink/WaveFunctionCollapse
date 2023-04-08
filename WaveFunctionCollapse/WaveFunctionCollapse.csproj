@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
@@ -15,9 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="samples\*"/>
-    <Resource Include="tilesets\*"/>
-    <Resource Include="samples.xml"/>
+    <Resource Include="samples\*" />
+    <Resource Include="tilesets\*" />
+    <Resource Include="samples.xml" />
   </ItemGroup>
 
 </Project>

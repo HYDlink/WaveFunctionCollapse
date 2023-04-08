@@ -27,12 +27,12 @@ public static class TileSetLoader
                     var (rightName, rightRotate) = ParseTileName(neighbor.Attribute("right").Value);
                     return new Neighbor(leftName, leftRotate, rightName, rightRotate);
                 }).ToList(),
-            null,
+
+            xroot.Element("subsets")?.Descendants()
+                ?.Select(s => new Subset(
+                    s.Attribute("name").Value,
+                    s.Descendants().Select(d => d.Attribute("name").Value).ToList()))?.ToList(),
             xroot.Attribute("unique") is { Value: "True"}
-            // xroot.Element("subsets").Descendants()
-            //     .Select(s => new Subset(
-            //         s.Attribute("name").Value,
-            //         s.Descendants().Select(d => d.Attribute("name").Value).ToList())).ToList()
         ) { Name = name };
         tileSet.TileSetDirectory = Path.GetDirectoryName(fileName);
         tileSet.CalcNeighbors();

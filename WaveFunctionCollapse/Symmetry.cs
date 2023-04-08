@@ -51,6 +51,24 @@ public static class SymmetryHelper
             _ => -1,
         };
 
+    public static bool IsHorizontalSymmetry(this Symmetry symmetry, int rotate = 0)
+        => (symmetry, rotate) switch
+        {
+            (I, _) => true,
+            (T, 0 or 2) => true,
+            _ => false,
+        };
+
+    public static int GetRotateByHorizontalFlip(this Symmetry symmetry, int rotate = 0)
+        => (symmetry, rotate) switch
+        {
+            (L, 0) => 1,
+            (L, 1) => 0,
+            (L, 2) => 3,
+            (L, 3) => 2,
+            _ => -1,
+        };
+
     public static int GetRotateWithSameRightEdge(this Symmetry symmetry, int rotate = 0)
         => (symmetry, rotate) switch
         {
